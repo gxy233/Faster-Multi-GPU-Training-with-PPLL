@@ -1,0 +1,88 @@
+
+###
+整个网络:
+占用GPU内存 3.604Gi/24.000Gi
+CPU内存 3368
+gpu利用率100%
+cpu利用率100%
+3.06it/s
+
+Device 3 [NVIDIA GeForce RTX 3090] PCIe GEN 4@16x RX: 103.5 MiB/s TX: 4.883 MiB/s
+GPU 1605MHz MEM 9501MHz TEMP  53°C FAN  32% POW 348 / 350 W
+GPU[|||||||||||||||||||||||||||||||100%] MEM[|||||              3.604Gi/24.000Gi]
+
+[train epoch 0] loss: 1.997, acc: 0.264: 100%|█████████████████████████████████████████████████████████████████████████| 391/391 [02:10<00:00,  3.00it/s]
+[valid epoch 0] loss: 1.935, acc: 0.296: 100%|███████████████████████████████████████████████████████████████████████████| 79/79 [00:07<00:00, 10.32it/s]
+
+数据并行：
+
+k=4:
+ Device 3 [NVIDIA GeForce RTX 3090] PCIe GEN 4@16x RX: 7.781 GiB/s TX: 9.974 GiB/s
+ GPU 1950MHz MEM 9501MHz TEMP  41°C FAN  32% POW 148 / 350 W
+ GPU[|||||||||||||||||||||||||||||||100%] MEM[||||||||||||       8.176Gi/24.000Gi]
+ Device 4 [NVIDIA GeForce RTX 3090] PCIe GEN 4@16x RX: 8.179 GiB/s TX: 954.1 MiB/s
+ GPU 1965MHz MEM 9501MHz TEMP  41°C FAN  32% POW 150 / 350 W
+ GPU[|||||||||||||||||||||||||||||||100%] MEM[||||||||||||||||||13.315Gi/24.000Gi]
+ Device 5 [NVIDIA GeForce RTX 3090] PCIe GEN 4@16x RX: 28.32 MiB/s TX: 8.255 GiB/s
+ GPU 1950MHz MEM 9501MHz TEMP  40°C FAN  32% POW 149 / 350 W
+ GPU[|||||||||||||||||||||||||||||||100%] MEM[||||||||||||       8.176Gi/24.000Gi]
+ Device 7 [NVIDIA GeForce RTX 3090] PCIe GEN 4@16x RX: 6.150 GiB/s TX: 2.930 MiB/s
+ GPU 1980MHz MEM 9501MHz TEMP  45°C FAN  32% POW 152 / 350 W
+ GPU[|||||||||||||||||||||||||||||||100%] MEM[||||||||||||       8.176Gi/24.000Gi]
+
+1730050 guoxiuyuan   4 Compute  83%  13312MiB  54%     0%  10051MiB python /data/share/torch_projects/guoxiuyuan/temp_name/train.py                      
+1730050 guoxiuyuan   3 Compute  83%   8050MiB  33%   119%  10051MiB python /data/share/torch_projects/guoxiuyuan/temp_name/train.py
+1730050 guoxiuyuan   5 Compute  82%   8050MiB  33%     0%  10051MiB python /data/share/torch_projects/guoxiuyuan/temp_name/train.py
+1730050 guoxiuyuan   7 Compute  85%   8050MiB  33%     0%  10051MiB python /data/share/torch_projects/guoxiuyuan/temp_name/train.py
+
+9.16s/it
+
+
+
+模型并行
+k=2:
+---- exp1:
+aux_depth_list=[1,1,1,2,2,2]
+aux_depth_list=[3,3,3,4,4,4]
+
+GPU1: 内存 3.268Gi/24.000Gi gpu利用率91% cpu内存3026 cpu利用率150%
+GPU1: 内存 2.317Gi/24.000Gi gpu利用率47% cpu内存2050 cpu利用率0%
+4.52it/s
+
+
+
+---- exp2:
+aux_depth_list=[1,1,1,2]
+aux_depth_list=[2,2,3,3,3,4,4,4]
+不均衡
+
+---- exp3:
+aux_depth_list=[1,1,1,2,2]
+aux_depth_list=[2,3,3,3,4,4,4]
+
+ Device 4 [NVIDIA GeForce RTX 3090] PCIe GEN 4@16x RX: 95.70 MiB/s TX: 4.883 MiB/s
+ GPU 1665MHz MEM 9501MHz TEMP  64°C FAN  47% POW 263 / 350 W
+ GPU[|||||||||||||||||||||||||       71%] MEM[|||||              3.153Gi/24.000Gi]
+ Device 5 [NVIDIA GeForce RTX 3090] PCIe GEN 4@16x RX: 15.62 MiB/s TX: 157.2 MiB/s
+ GPU 1605MHz MEM 9501MHz TEMP  65°C FAN  46% POW 276 / 350 W
+ GPU[||||||||||||||||||||||||||||||||97%] MEM[||||               2.434Gi/24.000Gi]
+
+  PID             USER   DEV    TYPE  GPU        GPU MEM    CPU  HOST MEM 
+3218303       guoxiuyuan   4 Compute  92%   2906MiB  12%   193%   6167MiB 
+3218303       guoxiuyuan   5 Compute  76%   2170MiB   9%     0%   6167MiB 
+
+
+5.33it/s
+
+[train epoch 0] loss: 1.993 acc: 0.264 
+[train epoch 1] loss: 1.930 acc: 0.290 
+[train epoch 2] loss: 1.905 acc: 0.302 
+[train epoch 3] loss: 1.888 acc: 0.310 
+[train epoch 4] loss: 1.874 acc: 0.317 
+[train epoch 5] loss: 1.863 acc: 0.322 
+[train epoch 6] loss: 1.852 acc: 0.328 
+[train epoch 7] loss: 1.845 acc: 0.333 
+[train epoch 8] loss: 1.836 acc: 0.337 
+[train epoch 9] loss: 1.830 acc: 0.337 
+[train epoch 10] loss: 1.824 acc: 0.341 
+...
