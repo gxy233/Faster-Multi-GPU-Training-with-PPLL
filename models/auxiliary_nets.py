@@ -2,68 +2,44 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from .losses import SupConLoss
+# from losses import SupConLoss
 
 
 class Decoder(nn.Module):
     def __init__(self, inplanes, image_size, interpolate_mode='bilinear', widen=1):
         super(Decoder, self).__init__()
 
-        self.image_size = image_size // 2
+        self.image_size = image_size
 
         assert interpolate_mode in ['bilinear', 'nearest']
         self.interpolate_mode = interpolate_mode
 
         self.bce_loss = nn.BCELoss()
 
-        self.decoders = nn.ModuleList([
-            nn.Sequential(
-                nn.Conv2d(inplanes, int(12 * widen), kernel_size=3, stride=1, padding=1),
-                nn.BatchNorm2d(int(12 * widen)),
-                nn.ReLU(),
-                nn.Conv2d(int(12 * widen), 3, kernel_size=3, stride=1, padding=1),
-                nn.Sigmoid(),
-            ) for _ in range(4)
-        ])
-    def forward(self, features, image_ori):
-        b,c,h,w = features.shape
-        B,C,H,W = image_ori.shape
-        patch_1 = features[:,:,:h // 2,:w // 2]
-        patch_2 = features[:,:,:h // 2,w // 2:]
-        patch_3 = features[:,:,h // 2:,:w // 2]
-        patch_4 = features[:,:,h // 2:,w // 2:]
-        ori_1 = image_ori[:, :, :H // 2, :W // 2]
-        ori_2 = image_ori[:, :, :H // 2, W // 2:]
-        ori_3 = image_ori[:, :, H // 2:, :W // 2]
-        ori_4 = image_ori[:, :, H // 2:, W // 2:]
+        self.decoder = nn.Sequential(
+            nn.Conv2d(inplanes, int(12 * widen), kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(int(12 * widen)),
+            nn.ReLU(),
+            nn.Conv2d(int(12 * widen), 3, kernel_size=3, stride=1, padding=1),
+            nn.Sigmoid(),
+        )
 
+    def forward(self, features, image_ori):
         if self.interpolate_mode == 'bilinear':
-            patch_1 = F.interpolate(patch_1, size=[self.image_size, self.image_size],mode='bilinear', align_corners=True)
-            patch_2 = F.interpolate(patch_2, size=[self.image_size, self.image_size], mode='bilinear',
-                                    align_corners=True)
-            patch_3 = F.interpolate(patch_3, size=[self.image_size, self.image_size], mode='bilinear',
-                                    align_corners=True)
-            patch_4 = F.interpolate(patch_4, size=[self.image_size, self.image_size], mode='bilinear',
-                                    align_corners=True)
+            features = F.interpolate(features, size=[self.image_size, self.image_size],
+                                     mode='bilinear', align_corners=True)
         elif self.interpolate_mode == 'nearest':   # might be faster
-            patch_1 = F.interpolate(patch_1, size=[self.image_size, self.image_size],
-                                            mode='nearest')
-            patch_2 = F.interpolate(patch_2, size=[self.image_size, self.image_size],
-                                    mode='nearest')
-            patch_3 = F.interpolate(patch_3, size=[self.image_size, self.image_size],
-                                    mode='nearest')
-            patch_4 = F.interpolate(patch_4, size=[self.image_size, self.image_size],
-                                    mode='nearest')
+            features = F.interpolate(features, size=[self.image_size, self.image_size],
+                                     mode='nearest')
         else:
             raise NotImplementedError
-
-        loss = 1 * self.bce_loss(self.decoders[0](patch_1),ori_1) + 1 * self.bce_loss(self.decoders[1](patch_2),ori_2) \
-        + 1 * self.bce_loss(self.decoders[2](patch_3),ori_3) + 1 * self.bce_loss(self.decoders[3](patch_4),ori_4)
-
-        return loss
+        # print(image_ori)
+        # exit(0)
+        return self.bce_loss(self.decoder(features), image_ori)
 
 
 class AuxClassifier(nn.Module):
-    def __init__(self, inplanes, net_config='1c2f', loss_mode='contrast', class_num=10, widen=1, feature_dim=128):
+    def __init__(self, inplanes, net_config='1c2f', loss_mode='contrast', class_num=10, widen=1, feature_dim=128, device=None):
         super(AuxClassifier, self).__init__()
 
         assert inplanes in [16, 32, 64]
@@ -74,7 +50,7 @@ class AuxClassifier(nn.Module):
         self.feature_dim = feature_dim
 
         if loss_mode == 'contrast':
-            self.criterion = SupConLoss()
+            self.criterion = SupConLoss(device=device)
             self.fc_out_channels = feature_dim
         elif loss_mode == 'cross_entropy':
             self.criterion = nn.CrossEntropyLoss()

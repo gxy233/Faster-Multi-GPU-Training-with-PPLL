@@ -6,7 +6,7 @@ import random
 
 import torch
 from tqdm import tqdm
-
+from datetime import datetime
 import matplotlib.pyplot as plt
 
 
@@ -115,29 +115,50 @@ def read_pickle(file_name: str) -> list:
         return info_list
 
 
-def train_one_epoch_front(model, optimizer, data_loader, device, cache):
+def train_one_epoch_front(model, optimizer, data_loader, device, cache, inc_input=False):
+    
     model.train()
     optimizer.zero_grad()
 
     sample_num = 0
-    data_loader = tqdm(data_loader, file=sys.stdout)
+    data_loader = tqdm(data_loader, file=sys.stdout, unit=" it", unit_scale=True)
     for step, data in enumerate(data_loader):
+        
         images, labels = data
         sample_num += images.shape[0]
         
 
         pred = model.forward_features(images.to(device),labels.to(device))
+        
+        if inc_input:
+            # cache.append((images.cpu(),pred.detach().cpu(),labels.detach().cpu()))
+            cache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))  # 放入数据
+
+        else:
+            cache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))  # 放入数据
+            
+            # cache.append((pred.detach().cpu(),labels.detach().cpu()))
+            
+         # 获取当前时间并格式化，包含毫秒
+        # current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+        # # 打印带毫秒时间戳的消息
+        # print(f'[{current_time}] in train_one_epoch_front cache putone')
+        optimizer.step()
+        optimizer.zero_grad()
+        
 
         
-        cache.append((pred.detach().cpu(),labels.detach().cpu()))
     
     ###### Append 一个停止信号, 一个epoch结束
-    cache.append('END')
-    
+    # cache.append('END')
+    cache.put('END')  # 放入数据
+
+   
 
     return pred
 
-def train_one_epoch_back(model, optimizer, device, epoch, cache):
+def train_one_epoch_back(model, optimizer, device, epoch, cache, inc_input=False):
     model.train()
     loss_function = torch.nn.CrossEntropyLoss()
     accu_loss = torch.zeros(1).to(device)  # 累计损失
@@ -147,27 +168,61 @@ def train_one_epoch_back(model, optimizer, device, epoch, cache):
     sample_num = 0
     step = 0
     while True:
-        if len(cache)>0:
-            # print(f'cache volumn: {len(cache)}')
-            data = cache.pop(0)
+        # if len(cache)>0:
+        if not cache.empty():
+        
+            # current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            
+            # print(f'[{current_time}] in train_one_epoch_back cache volumn: {len(cache)}')
+            # print(f'in train_one_epoch_back cache volumn: {len(cache)}')
+            
+            # data = cache.pop(0)
+            data = cache.get()  # 从队列获取数据
+
             # print(data)
             #### 退出线程
             if data == 'END':
                 break 
-            inputs, labels = data
-            inputs = inputs.to(device)
-            labels = labels.to(device)
             
-            # print(f'\rget from cache -- data.shape:{inputs.shape} cache volumn(after): {len(cache)}',end='',flush=True)
             
-            step += 1
-            sample_num += inputs.shape[0]
+            pred=None
             
-            pred = model.forward(inputs,labels)
+            if inc_input:
+                oriimg, inputs, labels = data
+                oriimg=torch.tensor(oriimg)
+                inputs=torch.tensor(inputs)
+                inputs=torch.tensor(labels)
+                
+                oriimg = oriimg.to(device)
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+                
+                # print(f'\rget from cache -- data.shape:{inputs.shape} cache volumn(after): {len(cache)}',end='',flush=True)
+                
+                step += 1
+                sample_num += inputs.shape[0]
+        
+                pred = model.forward(inputs,labels,oriimg)
+            else:
+                
+                inputs, labels = data
+                inputs=torch.tensor(inputs)
+                labels=torch.tensor(labels)
+                
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+                
+                # print(f'\rget from cache -- data.shape:{inputs.shape} cache volumn(after): {len(cache)}',end='',flush=True)
+                
+                step += 1
+                sample_num += inputs.shape[0]
+    
+                pred = model.forward(inputs,labels)
+        
+            
+                
             pred_classes = torch.max(pred, dim=1)[1]
             accu_num += torch.eq(pred_classes, labels).sum()
-
-            
             
             loss = loss_function(pred, labels)
             # print(f'pred.requires_grad :{pred.requires_grad} loss.requires_grad:{loss.requires_grad}')
@@ -198,14 +253,25 @@ def train_one_epoch_mid(model, optimizer, device, in_cache, out_cache):
     model.train()
     optimizer.zero_grad()
     while True:
-        if len(in_cache)>0:
+        # if len(in_cache)>0:
+        if not in_cache.empty():
+            # 获取当前时间并格式化，包含毫秒
+            # current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+            # # 打印带毫秒时间戳的消息
+            # print(f'[{current_time}] in train_one_epoch_mid cache volume: {len(in_cache)}')
+            
             # print(f'cache volumn: {len(cache)}')
-            data = in_cache.pop(0)
+            
+            # data = in_cache.pop(0)
+            data = in_cache.get()
             # print(data)
             #### 退出线程
             if data == 'END':
                 break 
             inputs, labels = data
+            inputs=torch.tensor(inputs)
+            labels=torch.tensor(labels)
             inputs = inputs.to(device)
             labels = labels.to(device)
             
@@ -213,16 +279,21 @@ def train_one_epoch_mid(model, optimizer, device, in_cache, out_cache):
 
             
             pred = model.forward_features(inputs,labels)
-            out_cache.append((pred.detach().cpu(),labels.detach().cpu()))
-    
+            optimizer.step()
+            optimizer.zero_grad()
+            # out_cache.append((pred.detach().cpu(),labels.detach().cpu()))
+            out_cache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))
+            
+            
     ###### Append 一个停止信号, 一个epoch结束
-    out_cache.append('END')
+    # out_cache.append('END')
+    out_cache.put('END')
     
 
     return pred
 
 @torch.no_grad()
-def evaluate_front(model, data_loader, device, evacache):
+def evaluate_front(model, data_loader, device, evacache, inc_input=False):
 
     model.eval()
 
@@ -231,13 +302,14 @@ def evaluate_front(model, data_loader, device, evacache):
     for step, data in enumerate(data_loader):
         images, labels = data
         sample_num += images.shape[0]
-
+        
         pred = model.forward_features(images.to(device),labels.to(device))
-       
-        evacache.append((pred.detach().cpu(),labels.detach().cpu()))
+  
+        # evacache.append((pred.detach().cpu(),labels.detach().cpu()))
+        evacache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))
         
-        
-    evacache.append('END')
+    # evacache.append('END')
+    evacache.put('END')
     
     return pred
 
@@ -247,31 +319,39 @@ def evaluate_mid(model, device, in_evacache, out_evacache):
     model.eval()
     
     while True:
-        if len(in_evacache)>0:
+        # if len(in_evacache)>0:
+        if not in_evacache.empty():
+            
             # print(f'cache volumn: {len(cache)}')
-            data = in_evacache.pop(0)
+            # data = in_evacache.pop(0)
+            data = in_evacache.get()
+            
             # print(data)
             #### 退出线程
             if data == 'END':
                 break 
             inputs, labels = data
+            inputs=torch.tensor(inputs)
+            labels=torch.tensor(labels)
             inputs = inputs.to(device)
             labels = labels.to(device)
             
             # print(f'\rget from cache -- data.shape:{inputs.shape} cache volumn(after): {len(cache)}',end='',flush=True)
             
             pred = model.forward_features(inputs,labels)
-            out_evacache.append((pred.detach().cpu(),labels.detach().cpu()))
+            out_evacache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))
+            
+            # out_evacache.append((pred.detach().cpu(),labels.detach().cpu()))
     
     ###### Append 一个停止信号, 一个epoch结束
-    out_evacache.append('END')
+    out_evacache.put('END')
     
 
     return pred
 
 
 @torch.no_grad()
-def evaluate_back(model, device, epoch, evacache):
+def evaluate_back(model, device, epoch, evacache, inc_input=False):
     loss_function = torch.nn.CrossEntropyLoss()
 
     model.eval()
@@ -281,12 +361,21 @@ def evaluate_back(model, device, epoch, evacache):
     sample_num = 0
     step = 0
     while True:
-        if len(evacache)>0:
-            data = evacache.pop(0)
+        if not evacache.empty():
+        
+        # if len(evacache)>0:
+            
+            data = evacache.get()
+            
+            # data = evacache.pop(0)
             #### 退出线程
             if data == 'END':
                 break 
+            
+                
             inputs, labels = data
+            inputs=torch.tensor(inputs)
+            labels=torch.tensor(labels)
             inputs = inputs.to(device)
             labels = labels.to(device)
             
@@ -296,6 +385,7 @@ def evaluate_back(model, device, epoch, evacache):
             
             #### 推理阶段 target=None
             pred = model(inputs,target=None)
+                
             pred_classes = torch.max(pred, dim=1)[1]
             accu_num += torch.eq(pred_classes, labels).sum()
 
@@ -304,6 +394,8 @@ def evaluate_back(model, device, epoch, evacache):
 
     print("[valid epoch {}] loss: {:.3f}, acc: {:.3f}".format(epoch, accu_loss.item() / (step + 1),accu_num.item() / sample_num))
     return  accu_loss.item() / (step + 1), accu_num.item() / sample_num
+
+
 
 
 

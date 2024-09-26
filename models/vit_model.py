@@ -444,6 +444,10 @@ class VisionTransformer_front(nn.Module):
         nn.init.trunc_normal_(self.cls_token, std=0.02)
         self.apply(_init_vit_weights)
     def get_block_count(self,aux_depth, max_depth):
+        
+        
+   
+        
         return max_depth - aux_depth+1
     def forward_features(self, x, target):
         # [B, C, H, W] -> [B, num_patches, embed_dim]
@@ -809,6 +813,7 @@ def vit_base_patch16_224_front(img_size,patch_size,aux_depth_list, num_classes: 
     weights ported from official Google JAX impl:
     链接: https://pan.baidu.com/s/1zqb08naP0RPqqfSXfkB2EA  密码: eu9f
     """
+    
     model_front = VisionTransformer_front(img_size=img_size,
                               patch_size=patch_size,
                               embed_dim=768,

@@ -1,0 +1,5 @@
+*.pth
+
+weights/
+whole/
+data/

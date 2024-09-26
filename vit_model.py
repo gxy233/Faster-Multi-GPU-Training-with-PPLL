@@ -305,6 +305,8 @@ class VisionTransformer(nn.Module):
         if self.training:
 
             for block, aux_classifier in zip(self.blocks, self.aux_classifiers):
+                # print(f'before block x.shape{x.shape}')
+                # print(f'block {block}')
                 x = block(x)
                 loss = aux_classifier(x,target)
                 loss.backward()

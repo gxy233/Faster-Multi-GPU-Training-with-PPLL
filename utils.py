@@ -126,6 +126,8 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch):
     data_loader = tqdm(data_loader, file=sys.stdout)
     for step, data in enumerate(data_loader):
         images, labels = data
+        
+        # print(f'images.shape: {images.shape}')
         sample_num += images.shape[0]
 
         pred = model(images.to(device),labels.to(device))

@@ -1,0 +1,13 @@
+------------------ start ---------------
+Timestamp: 2024-09-26 08:38:12
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-26 08:38:22
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+

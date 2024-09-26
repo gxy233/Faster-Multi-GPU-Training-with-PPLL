@@ -35,7 +35,7 @@ k=4:
 1730050 guoxiuyuan   5 Compute  82%   8050MiB  33%     0%  10051MiB python /data/share/torch_projects/guoxiuyuan/temp_name/train.py
 1730050 guoxiuyuan   7 Compute  85%   8050MiB  33%     0%  10051MiB python /data/share/torch_projects/guoxiuyuan/temp_name/train.py
 
-9.16s/it
+9.16it/s
 
 
 

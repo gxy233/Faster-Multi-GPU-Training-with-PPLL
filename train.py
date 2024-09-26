@@ -43,7 +43,7 @@ def main(args):
     val_loader = torch.utils.data.DataLoader(testset, batch_size=128,
                                             shuffle=False, num_workers=2)
 
-    model = create_model(img_size=32,patch_size=4,num_classes=args.num_classes).to(device)
+    model = create_model(img_size=32,patch_size=16,num_classes=args.num_classes).to(device)
     
     
     # device_ids = [0,1,2,3]
@@ -55,28 +55,35 @@ def main(args):
         assert os.path.exists(args.weights), "weights file: '{}' not exist.".format(args.weights)
         weights_dict = torch.load(args.weights, map_location=device)
 # 假设 weights_dict 是你加载的预训练权重字典
-        # pos_embed = weights_dict['pos_embed']
+        pos_embed = weights_dict['pos_embed']
 
-        # # 从 pos_embed 中移除类标记的位置
-        # pos_embed_without_cls = pos_embed[:, 1:, :]
+        # 从 pos_embed 中移除类标记的位置
+        pos_embed_without_cls = pos_embed[:, 1:, :]
 
-        # # 重塑 pos_embed 以形成二维网格
-        # pos_embed_reshaped = pos_embed_without_cls.reshape(1, 768, 14, 14)
+        # 重塑 pos_embed 以形成二维网格
+        pos_embed_reshaped = pos_embed_without_cls.reshape(1, 768, 14, 14)
 
-        # # 对位置嵌入进行插值以适应新的尺寸
-        # interpolated_pos_embed = F.interpolate(pos_embed_reshaped, size=(2, 2), mode='bilinear', align_corners=False)
+        # 对位置嵌入进行插值以适应新的尺寸
+        interpolated_pos_embed = F.interpolate(pos_embed_reshaped, size=(2, 2), mode='bilinear', align_corners=False)
 
-        # # 将类标记的位置添加回去
+        # 将类标记的位置添加回去
         # cls_token = pos_embed[:, :1, :].unsqueeze(2)  # 增加一个维度以匹配 interpolated_pos_embed
+        cls_token = pos_embed[:, :1, :]
+        
+        # print(cls_token.shape)
         # interpolated_pos_embed = torch.cat([cls_token, interpolated_pos_embed.reshape(1, 768, 4)], dim=2)
+        interpolated_pos_embed = torch.cat([cls_token.transpose(1,2), interpolated_pos_embed.reshape(1, 768, 4)], dim=2)
+        
 
-        # # 更新 weights_dict 中的位置嵌入
-        # weights_dict['pos_embed'] = interpolated_pos_embed.reshape(1, 5, 768)
+        # 更新 weights_dict 中的位置嵌入
+        weights_dict['pos_embed'] = interpolated_pos_embed.reshape(1, 5, 768)
 
 
         # 删除不需要的权重
-        del_keys = ['head.weight', 'head.bias'] if model.has_logits \
+        del_keys = ['head.weight', 'head.bias'] if model.module.has_logits \
             else ['pre_logits.fc.weight', 'pre_logits.fc.bias', 'head.weight', 'head.bias']
+        # del_keys = ['head.weight', 'head.bias'] if model.has_logits \
+            # else ['pre_logits.fc.weight', 'pre_logits.fc.bias', 'head.weight', 'head.bias']
         for k in del_keys:
             if k in weights_dict:
                 del weights_dict[k]
@@ -86,13 +93,14 @@ def main(args):
         print("Missing keys:", missing_keys)
         print("Unexpected keys:", unexpected_keys)
 
-    if args.freeze_layers:
-        for name, para in model.named_parameters():
-            # 除head, pre_logits外，其他权重全部冻结
-            if "head" not in name and "pre_logits" not in name:
-                para.requires_grad_(False)
-            else:
-                print("training {}".format(name))
+    # if args.freeze_layers:
+    #     for name, para in model.named_parameters():
+    #         # 除head, pre_logits外，其他权重全部冻结
+    #         # if "head" not in name and "pre_logits" not in name:
+    #         if "blocks" in name:
+    #             para.requires_grad_(False)
+    #         else:
+    #             print("training {}".format(name))
 
     pg = [p for p in model.parameters() if p.requires_grad]
     optimizer = optim.SGD(pg, lr=args.lr, momentum=0.9, weight_decay=5E-5)
@@ -147,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument('--model-name', default='', help='create model name')
 
     # 预训练权重路径，如果不想载入就设置为空字符
-    parser.add_argument('--weights', type=str, default='',
+    parser.add_argument('--weights', type=str, default='/home/chengqixu/gxy/temp_name/vit_base_patch16_224.pth',
                         help='initial weights path')
     # 是否冻结权重
     parser.add_argument('--freeze-layers', type=bool, default=True)

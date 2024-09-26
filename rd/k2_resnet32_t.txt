@@ -1,0 +1,6 @@
+Timestamp: 2024-09-17 09:16:24
+GPU 0:
+  Memory Allocated: 12.00 MB (0.11%)
+GPU 1:
+  Memory Allocated: 12.00 MB (0.11%)
+

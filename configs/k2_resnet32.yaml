@@ -2,47 +2,66 @@ k: 2
 
 
 front:
-    num_classes: 10
-    epochs: 400
-    batch_size: 1024
 
     # data_path: '/data/flower_photos'
     partname: 'front'
 
     weights: ''
     # 是否冻结权重
-    freeze_layers: True
+    freeze_layers: False
     device: 'cuda:0'
-    aux_depth_list: [1,1,1,2,2]
+    layers: [5, 5]
+    inplanes: 32
+    wide_list: [16, 32]
+    image_size: 32
+    infopro_config: [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4],
+                    [2, 0], [2, 1], [2, 2], [2, 3], [2, 4]]
 
 back:
-    num_classes: 10
-    epochs: 400
-    batch_size: 1024
 
     # data_path: '/data/flower_photos'
     partname: 'back'
 
     weights: ''
     # 是否冻结权重
-    freeze_layers: True
+    freeze_layers: False
     device: 'cuda:1'
-    aux_depth_list: [2,3,3,3,4,4,4]
-   
+    layers: [5]
+    inplanes: 32
+    wide_list: [64]
+    # infopro_config: [[3, 0], [3, 1], [3, 2], [3, 3], [3, 4]]
+    infopro_config: [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4]]
+
 
 common:
     # dataset
     dataset: 'CIFAR10'
     # OPTIMIZER
     optimizer: 'SGD'
-    lr: 0.0008
+    lr: 0.01
     lr_decay_rate : 0.1
     lrf: 0.01
     momentum: 0.9
-    weight_decay: 0.00005 
+    weight_decay: 1e-4
     milestones : [80, 120]  # 在第 80 和 120 个 epoch 时衰减学习率
 
-    model_name: vit_224_p16
+    model_name: k2_resnet32
+    exp_name: k2_resnet32
 
-    img_size: 32
+
+
+    image_size: 32
     patch_size: 4
+
+    local_module_num: 16
+    batch_size: 1024
+    class_num: 10
+    dropout_rate: 0
+    aux_net_config: '1c2f'
+    local_loss_mode: 'contrast'
+    aux_net_widen: 1
+    aux_net_feature_dim: 128
+
+
+    epochs: 400
+    inc_input: True
