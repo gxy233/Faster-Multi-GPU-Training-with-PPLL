@@ -1,0 +1,78 @@
+k: 4
+
+front:
+
+    # data_path: '/data/flower_photos'
+    partname: 'front'
+
+    weights: ''
+    device: 'cuda:0'
+    aux_depth_list: [1,1]
+
+mid: 
+    part1:
+
+        partname: 'mid_part1'
+
+        weights: ''
+        # 是否冻结权重
+
+        freeze_layers: True
+        device: 'cuda:1'
+        # aux_depth_list: [1,2,2]
+        aux_depth_list: [1,2,2]
+
+
+    part2:
+
+        partname: 'mid_part2'
+
+        weights: ''
+
+        device: 'cuda:2'
+        # aux_depth_list: [2,3,3]
+        aux_depth_list: [2,3,3]
+
+
+back:
+
+    # data_path: '/data/flower_photos'
+    partname: 'back'
+
+    weights: ''
+
+    device: 'cuda:3'
+    # aux_depth_list: [3,4,4,4]
+    aux_depth_list: [3,4,4,4]
+
+   
+
+
+
+common:
+
+    num_classes: 10
+    # dataset
+    dataset: 'STL-10'
+    # OPTIMIZER
+    optimizer: 'SGD'
+    lr: 0.0008
+    lr_decay_rate : 0.1
+    lrf: 0.01
+    momentum: 0.9
+    weight_decay: 0.00005 
+    milestones : [80, 120]  # 在第 80 和 120 个 epoch 时衰减学习率
+    scheduler: True
+    adjustlr: False
+
+
+
+    model_name: vit_224_p16
+    exp_name: k4_vit_224_p16
+
+    img_size: 96
+    patch_size: 16
+
+    epochs: 50
+    batch_size: 128
+    inc_input: False

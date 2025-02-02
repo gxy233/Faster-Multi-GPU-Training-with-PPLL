@@ -9,6 +9,9 @@ from tqdm import tqdm
 from datetime import datetime
 import matplotlib.pyplot as plt
 
+log_prefix = '/home/chengqixu/gxy/temp_name1/logs'
+log_path = 'UNSET'
+
 
 def read_split_data(root: str, val_rate: float = 0.2):
     random.seed(0)  # 保证随机结果可复现
@@ -121,31 +124,43 @@ def train_one_epoch_front(model, optimizer, data_loader, device, cache, inc_inpu
     optimizer.zero_grad()
 
     sample_num = 0
-    data_loader = tqdm(data_loader, file=sys.stdout, unit=" it", unit_scale=True)
-    for step, data in enumerate(data_loader):
-        
-        images, labels = data
-        sample_num += images.shape[0]
-        
 
-        pred = model.forward_features(images.to(device),labels.to(device))
+    global log_path
+    if log_path == 'UNSET':
+        log_path = log_prefix + '/' + model.__class__.__name__ + '-' + datetime.now().strftime('%Y-%m-%d:%H:%M:%S') + '.log'
+    data_loader = tqdm(data_loader, file=sys.stdout)
+    with open(log_path, 'a') as log_file:
         
-        if inc_input:
-            # cache.append((images.cpu(),pred.detach().cpu(),labels.detach().cpu()))
-            cache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))  # 放入数据
-
-        else:
-            cache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))  # 放入数据
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        
+        print(f'[start_train {current_time}] in train_one_epoch_front')
+        for step, data in enumerate(data_loader):
             
-            # cache.append((pred.detach().cpu(),labels.detach().cpu()))
+            images, labels = data
+            sample_num += images.shape[0]
             
-         # 获取当前时间并格式化，包含毫秒
-        # current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            pred = model.forward_features(images.to(device),labels.to(device))
+            
+            if inc_input:
+                cache.put((images.detach().cpu().numpy(),pred.detach().cpu().numpy(),labels.detach().cpu().numpy()))
+                # cache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))  # 放入数据
 
-        # # 打印带毫秒时间戳的消息
-        # print(f'[{current_time}] in train_one_epoch_front cache putone')
-        optimizer.step()
-        optimizer.zero_grad()
+            else:
+                cache.put((pred.detach().cpu().numpy(), labels.detach().cpu().numpy()))  # 放入数据
+                
+                # cache.append((pred.detach().cpu(),labels.detach().cpu()))
+                
+            # 获取当前时间并格式化，包含毫秒
+            # current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+            # # 打印带毫秒时间戳的消息
+            # print(f'[{current_time}] in train_one_epoch_front cache putone')
+            optimizer.step()
+            optimizer.zero_grad()
+            rate = data_loader.format_dict['rate']
+            if rate is not None:
+                log_file.write("{:.2f} it/s \n".format(rate))
+
         
 
         
@@ -153,6 +168,7 @@ def train_one_epoch_front(model, optimizer, data_loader, device, cache, inc_inpu
     ###### Append 一个停止信号, 一个epoch结束
     # cache.append('END')
     cache.put('END')  # 放入数据
+    log_file.close()
 
    
 
@@ -189,13 +205,13 @@ def train_one_epoch_back(model, optimizer, device, epoch, cache, inc_input=False
             
             if inc_input:
                 oriimg, inputs, labels = data
-                oriimg=torch.tensor(oriimg)
-                inputs=torch.tensor(inputs)
-                inputs=torch.tensor(labels)
-                
-                oriimg = oriimg.to(device)
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+                # print('types:', type(oriimg), type(inputs), type(labels))
+                # oriimg=oriimg.clone().detach().float().requires_grad_(True).to(device)
+                # inputs=inputs.clone().detach().float().requires_grad_(True).to(device)
+                # labels=labels.clone().detach().float().requires_grad_(True).to(device)
+                oriimg = torch.tensor(oriimg).to(device)
+                inputs = torch.tensor(inputs).to(device)
+                labels = torch.tensor(labels).to(device)
                 
                 # print(f'\rget from cache -- data.shape:{inputs.shape} cache volumn(after): {len(cache)}',end='',flush=True)
                 
@@ -243,7 +259,9 @@ def train_one_epoch_back(model, optimizer, device, epoch, cache, inc_input=False
             optimizer.zero_grad()
             
             # print("\r[train epoch {}] loss: {:.3f} acc: {:.3f} len(cache):{}".format(epoch, accu_loss.item() / (step + 1), accu_num.item() / sample_num, len(cache)),end='',flush=True)
-            
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        
+    print(f'[end_train {current_time}] in train_one_epoch_back')
     print(f"-- finished: epoch {epoch}")
     print("[train epoch {}] loss: {:.3f} acc: {:.3f} ".format(epoch, accu_loss.item() / (step + 1), accu_num.item() / sample_num))
 

@@ -1,0 +1,14 @@
+{
+    "0": {
+        "train_loss": 2.1924455165863037,
+        "train_accuracy": 17.452829360961914
+    },
+    "1": {
+        "train_loss": NaN,
+        "train_accuracy": 10.141509056091309
+    },
+    "2": {
+        "train_loss": NaN,
+        "train_accuracy": 9.669811248779297
+    }
+}

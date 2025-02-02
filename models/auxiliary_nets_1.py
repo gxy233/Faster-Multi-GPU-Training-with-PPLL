@@ -15,7 +15,7 @@ class Decoder(nn.Module):
         self.interpolate_mode = interpolate_mode
 
         self.bce_loss = nn.BCELoss()
-
+        self.inplanes=inplanes
         self.decoder = nn.Sequential(
             nn.Conv2d(inplanes, int(12 * widen), kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(int(12 * widen)),
@@ -25,6 +25,7 @@ class Decoder(nn.Module):
         )
 
     def forward(self, features, image_ori):
+        # print(f'shape feature: {features.shape}  inplane:{self.inplanes}')
         if self.interpolate_mode == 'bilinear':
             features = F.interpolate(features, size=[self.image_size, self.image_size],
                                      mode='bilinear', align_corners=True)
@@ -33,8 +34,8 @@ class Decoder(nn.Module):
                                      mode='nearest')
         else:
             raise NotImplementedError
-        # print(image_ori)
-        # exit(0)
+        
+        
         return self.bce_loss(self.decoder(features), image_ori)
 
 

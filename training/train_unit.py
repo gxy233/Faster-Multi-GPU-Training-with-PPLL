@@ -16,6 +16,8 @@ import torchvision
 import torch.nn.functional as F
 
 from util.utils import  train_one_epoch_front,train_one_epoch_back,train_one_epoch_mid, evaluate_front, evaluate_mid, evaluate_back
+# from util.utils_pr import  train_one_epoch_front,train_one_epoch_back,train_one_epoch_mid, evaluate_front, evaluate_mid, evaluate_back
+
 from dataloader.load_data import get_dataloader
 from util.get_optimizer import get_optimizer
 from util.create_model import create_model
@@ -35,6 +37,9 @@ def train_front(args, comargs, cache, evacache):
 
     # print(f'args.aux_depth_list -1 {args.aux_depth_list}')
     model = create_model(model_name=comargs.model_name, part='front', args=args, comargs=comargs)
+    with open('/home/chengqixu/gxy/temp_name1/infopro_structure.txt', 'w') as f:
+        for name, module in model.named_modules():
+            f.write(f"Module Name: {name}, Module: {module}\n")
 
     
     if args.weights != "":
@@ -48,6 +53,7 @@ def train_front(args, comargs, cache, evacache):
         # exit(0)
     
 
+            
     pg = [p for p in model.parameters() if p.requires_grad]
     optimizer = get_optimizer(pg,comargs.optimizer,comargs.lr,comargs.momentum,comargs.weight_decay)
     
@@ -81,6 +87,7 @@ def train_front(args, comargs, cache, evacache):
         print(f'train_one_epoch_front finish')
         # exit(0)
           # validate
+        print(f'start evaluate front')
         pred = evaluate_front(model=model,
                             data_loader=val_loader,
                             device=args.device,
@@ -90,7 +97,7 @@ def train_front(args, comargs, cache, evacache):
         print(f'evaluate_front finish')
         # exit(0)
        
-        torch.save(model.state_dict(), f"./weights/{comargs.exp_name}/{args.partname}/model-{epoch}.pth")
+        # torch.save(model.state_dict(), f"./weights/{comargs.exp_name}/{args.partname}/model-{epoch}.pth")
 
 
 
@@ -123,6 +130,8 @@ def train_mid(args, comargs, in_cache, out_cache, in_evacache, out_evacache):
 
    
 
+   
+                
     pg = [p for p in model.parameters() if p.requires_grad]
     optimizer = get_optimizer(pg,comargs.optimizer,comargs.lr,comargs.momentum,comargs.weight_decay)
 
@@ -149,7 +158,7 @@ def train_mid(args, comargs, in_cache, out_cache, in_evacache, out_evacache):
                             in_evacache=in_evacache,
                             out_evacache=out_evacache)
 
-        torch.save(model.state_dict(), f"./weights/{comargs.exp_name}/{args.partname}/model-{epoch}.pth")
+        # torch.save(model.state_dict(), f"./weights/{comargs.exp_name}/{args.partname}/model-{epoch}.pth")
 
 
 
@@ -163,7 +172,8 @@ def train_back(args, comargs, cache, evacache):
     
     os.makedirs(f"./weights/{comargs.exp_name}/{args.partname}",exist_ok=True)
 
-    log_dir=f'./runs/{comargs.exp_name}'
+    # log_dir=f'./runs/{comargs.exp_name}'
+    log_dir = f'./test_run/{comargs.exp_name}'
     os.makedirs(log_dir,exist_ok=True)
     
     tb_writer = SummaryWriter(log_dir=log_dir)
@@ -185,8 +195,8 @@ def train_back(args, comargs, cache, evacache):
         print("back Unexpected keys:", unexpected_keys)
         
 
-    pg = [p for p in model.parameters() if p.requires_grad]
 
+    pg = [p for p in model.parameters() if p.requires_grad]
     
     optimizer = get_optimizer(pg,comargs.optimizer,comargs.lr,comargs.momentum,comargs.weight_decay)
     
@@ -218,6 +228,8 @@ def train_back(args, comargs, cache, evacache):
         print(f'train_one_epoch_back finish')
         # exit(0)
         # validate
+        print(f'start evaluate back')
+        
         val_loss, val_acc = evaluate_back(model=model,
                                      device=device,
                                      epoch=epoch,
@@ -231,10 +243,14 @@ def train_back(args, comargs, cache, evacache):
         tags = ["train_loss", "train_acc", "val_loss", "val_acc", "learning_rate"]
         tb_writer.add_scalar(tags[0], train_loss, epoch)
         tb_writer.add_scalar(tags[1], train_acc, epoch)
-        tb_writer.add_scalar(tags[2], val_loss, epoch)
-        tb_writer.add_scalar(tags[3], val_acc, epoch)
+        # tb_writer.add_scalar(tags[2], val_loss, epoch)
+        # tb_writer.add_scalar(tags[3], val_acc, epoch)
         tb_writer.add_scalar(tags[4], optimizer.param_groups[0]["lr"], epoch)
 
-        torch.save(model.state_dict(), f"./weights/{comargs.exp_name}/{args.partname}/model-{epoch}.pth")
+        # print(f'Train:\nloss:{train_loss}\nacc:{train_acc}\n\nVal:\nloss:{val_loss}\nacc:{val_acc}')
+
+        tb_writer.close()
+
+        # torch.save(model.state_dict(), f"./weights/{comargs.exp_name}/{args.partname}/model-{epoch}.pth")
 
 

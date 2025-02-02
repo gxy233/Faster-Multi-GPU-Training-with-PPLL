@@ -1,6 +1,133 @@
-Timestamp: 2024-09-17 09:16:24
+------------------ start ---------------
+Timestamp: 2024-09-28 03:10:33
 GPU 0:
-  Memory Allocated: 12.00 MB (0.11%)
+  Memory Allocated: 0.00 MB (0.00%)
 GPU 1:
-  Memory Allocated: 12.00 MB (0.11%)
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:10:43
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:10:53
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:11:03
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:11:13
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:11:23
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:11:33
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:11:43
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:11:53
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:12:03
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:12:13
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:12:23
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:12:33
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:12:43
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:12:53
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:13:03
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:13:13
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:13:23
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:13:33
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:13:43
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:13:53
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
+
+Timestamp: 2024-09-28 03:14:03
+GPU 0:
+  Memory Allocated: 0.00 MB (0.00%)
+GPU 1:
+  Memory Allocated: 0.00 MB (0.00%)
 

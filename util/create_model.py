@@ -1,6 +1,7 @@
-from models.vit_model import vit_base_patch16_224_front,vit_base_patch16_224_back,vit_base_patch16_224_mid 
+from models.vit_model import vit_base_patch16_224_front,vit_base_patch16_224_back,vit_base_patch16_224_mid, vit_base_patch16_224_front_dp,vit_base_patch16_224_back_dp,vit_base_patch16_224_mid_dp,vit_base_patch16_224_front_pr,vit_base_patch16_224_back_pr
+    
 # from models.resnetInfoPro import resnet32_front, resnet32_back
-from models.resnetInfoPro_t import resnet32_front, resnet32_back
+# from models.resnetInfoPro_t import resnet32_front, resnet32_back
 
 
 def create_model(model_name, part,args,comargs):
@@ -18,7 +19,48 @@ def create_model(model_name, part,args,comargs):
             return vit_base_patch16_224_mid(aux_depth_list=aux_depth_list,num_classes=num_classes).to(device)
         elif part == 'back':
             return vit_base_patch16_224_back(aux_depth_list=aux_depth_list,num_classes=num_classes).to(device)
-        
+    
+    
+    
+    
+    
+    if model_name.startswith('dp_vit_224'):
+        img_size=comargs.img_size
+        patch_size=comargs.patch_size
+        aux_depth_list=args.aux_depth_list
+        num_classes=comargs.num_classes
+        device=args.device
+        split_size=comargs.split_size
+        if part == 'front':
+            
+            return vit_base_patch16_224_front_dp(img_size=img_size,patch_size=patch_size,aux_depth_list=aux_depth_list,split_size=split_size,num_classes=num_classes).to(device)
+        elif part == 'mid':
+            return vit_base_patch16_224_mid_dp(aux_depth_list=aux_depth_list,split_size=split_size,num_classes=num_classes).to(device)
+        elif part == 'back':
+            return vit_base_patch16_224_back_dp(aux_depth_list=aux_depth_list,split_size=split_size,num_classes=num_classes).to(device)
+  
+  
+     
+    if model_name.startswith('pr_vit_224'):
+        img_size=comargs.img_size
+        patch_size=comargs.patch_size
+        aux_depth_list=args.aux_depth_list
+        num_classes=comargs.num_classes
+        device=args.device
+        max_depth=comargs.max_depth
+        if part == 'front':
+            
+            return vit_base_patch16_224_front_pr(img_size=img_size,patch_size=patch_size,aux_depth_list=aux_depth_list,num_classes=num_classes,max_depth=max_depth).to(device)
+        # elif part == 'mid':
+        #     return vit_base_patch16_224_mid_dp(aux_depth_list=aux_depth_list,num_classes=num_classes).to(device)
+        elif part == 'back':
+            return vit_base_patch16_224_back_pr(aux_depth_list=aux_depth_list,num_classes=num_classes,max_depth=max_depth).to(device)
+  
+  
+  
+  
+  
+  
     # if model_name == 'k2_resnet32':
     
         

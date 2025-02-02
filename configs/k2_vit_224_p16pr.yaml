@@ -1,0 +1,69 @@
+k: 2
+
+front:
+    # data_path: '/data/flower_photos'
+    partname: 'front'
+
+    weights: ''
+
+    # 是否冻结权重
+    freeze_layers: True
+    device: 'cuda:0' 
+    # aux_depth_list: [2,2,2,1,1]   #change1   20it/s
+
+    # aux_depth_list: [3,3,3,2,2]   #change1   15it/s
+
+    aux_depth_list: [4,4,4,3,3]     #change2 ori     12it/s
+
+    # aux_depth_list: [1,1,1,2,2]   #ori    12it/s
+
+
+back:
+
+    # data_path: '/data/flower_photos'
+    partname: 'back'
+
+    weights: ''
+
+    # 是否冻结权重
+    freeze_layers: True
+    device: 'cuda:1'
+
+    # aux_depth_list: [1,1,1,1,0,0,0]   #change1  20it/s
+
+    # aux_depth_list: [2,1,1,1,1,1,1]   #change1  15it/s
+
+    aux_depth_list: [3,2,2,2,1,1,1]     #change2 ori  12it/s
+
+    # aux_depth_list: [2,3,3,3,4,4,4]   #ori 12it/s
+
+   
+
+common:
+    num_classes: 10
+    # dataset
+    dataset: 'CIFAR10'
+    # OPTIMIZER
+    optimizer: 'SGD'
+    lr: 0.0008
+    lr_decay_rate : 0.1
+    lrf: 0.01
+    momentum: 0.9
+    weight_decay: 0.00005 
+    milestones : [80, 120]  # 在第 80 和 120 个 epoch 时衰减学习率
+    scheduler: True
+    adjustlr: False
+
+
+
+    model_name: pr_vit_224_p16
+    exp_name: k2_vit_224_p16pr
+
+    img_size: 32
+    patch_size: 16
+
+    epochs: 50
+    batch_size: 128
+    inc_input: False
+
+    max_depth: 4

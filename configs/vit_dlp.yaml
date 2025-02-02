@@ -1,0 +1,24 @@
+training_params:
+  gpu_num: 4
+  gpu_offset: 0
+  layer_num: 12
+  lr: 0.0008
+  momentum: 0.9
+  weight_decay: 0.00005
+  max_epoch: 200
+  # for CIFAR10, SVHN, STL10
+  # train_bs: 128
+  # test_bs: 128
+  # for Food101 and ImageNet
+  train_bs: 32
+  test_bs: 32
+
+
+model_params:
+    # dataset choose from: CIFAR10, STL10, SVHN, Food101, ImageNet
+    dataset: ImageNet
+    aug_list: [2,2,2,1,1,1,0,0,0,0,0,0]
+    # aug_list: [3,3,3,2,2,2,1,1,1,0,0,0]
+    # aug_list: [4,4,4,3,3,3,2,2,2,1,1,1]
+
+    

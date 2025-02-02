@@ -1,0 +1,80 @@
+k: 2
+
+
+front:
+
+    # data_path: '/data/flower_photos'
+    partname: 'front'
+
+    weights: ''
+    # 是否冻结权重
+    freeze_layers: False
+    device: 'cuda:0'
+    layers: [5,5,5]
+
+    inplanes: 16
+    image_size: 32
+    infopro_config: [1, 2, 3, 4, 5, 
+                    6, 7, 8, 9]
+
+    wide_list: [16, 16, 32, 64]
+
+back:
+
+    partname: 'back'
+
+    weights: ''
+    # 是否冻结权重
+    freeze_layers: False
+    device: 'cuda:1'
+    layers: [5]
+
+    inplanes: 32
+    infopro_config: [1, 2, 3, 4]
+    wide_list: [16, 16, 32, 64]
+
+
+common:
+    # dataset
+    dataset: 'CIFAR10'
+    # OPTIMIZER
+    optimizer: 'SGD'
+    lr: 0.8
+    lr_decay_rate : 0.1
+    lrf: 0.01
+    momentum: 0.995
+    weight_decay: 0.0001
+    cos_lr: True
+    milestones : [80, 120]  # 在第 80 和 120 个 epoch 时衰减学习率
+    scheduler: False
+    adjustlr: False
+
+    model_name: k2_resnet32_t
+    exp_name: k2_resnet32_t
+
+
+
+    image_size: 32
+    patch_size: 4
+
+    local_module_num: 16
+    batch_size: 1024
+    class_num: 10
+    dropout_rate: 0
+    aux_net_widen: 1
+    aux_net_feature_dim: 128
+
+    epochs: 400
+    inc_input: True
+    ixx_1: 5
+    ixy_1: 0.5
+    ixx_2: 0
+    ixy_2: 0
+    
+    #AUX
+    aux_net_config: '2c2f'
+    local_loss_mode: 'cross_entropy'
+
+
+    InfoPro: 'resnet32'
+    

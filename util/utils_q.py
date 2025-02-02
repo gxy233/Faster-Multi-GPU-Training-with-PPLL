@@ -8,7 +8,7 @@ import torch
 from tqdm import tqdm
 from datetime import datetime
 import matplotlib.pyplot as plt
-
+##################    用共享内存实现   #####################
 
 def read_split_data(root: str, val_rate: float = 0.2):
     random.seed(0)  # 保证随机结果可复现

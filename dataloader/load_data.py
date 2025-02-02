@@ -34,6 +34,43 @@ def get_dataloader(dataset,batch_size):
         val_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                                 shuffle=False, num_workers=2)
         
+    elif dataset == 'STL-10':
+        transform = transforms.Compose(
+            [
+                transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         
-        return train_loader, val_loader
+        trainset = torchvision.datasets.STL10(root='./data', split="train", transform=transform, download=True)
+        testset = torchvision.datasets.STL10(root='./data', split="test", transform=transform, download=True)
+
+    # 同样的方法应用于测试集
+        train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                                shuffle=True, num_workers=2)
+        
+        val_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                                shuffle=False, num_workers=2)
+    
+    
+    
+    elif dataset == 'SVHN':
+        transform = transforms.Compose(
+            [
+                transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        
+        
+        trainset = torchvision.datasets.SVHN(root='./data', split="train", transform=transform, download=True)
+        testset = torchvision.datasets.SVHN(root='./data', split="test", transform=transform, download=True)
+        
+    
+
+    # 创建数据加载器
+        train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                                shuffle=True, num_workers=2)
+        
+        val_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                                shuffle=False, num_workers=2)
+    
+
+    return train_loader, val_loader
 

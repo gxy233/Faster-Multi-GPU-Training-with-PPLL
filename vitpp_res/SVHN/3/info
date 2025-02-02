@@ -1,0 +1,2 @@
+dataset: SVHN
+gpu_num: 2
